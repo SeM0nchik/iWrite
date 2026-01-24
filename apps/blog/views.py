@@ -1,5 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
+from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank, SearchHeadline
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, View
 
 from .models import Post, Category, Rating
@@ -192,6 +193,24 @@ class RatingCreateView(View):
                 rating.save()
         return JsonResponse({'rating_sum': rating.post.get_sum_rating()})
 
+class BlogSearchView(ListView):
+    model = Post
+    template_name = 'blog/post_list.html'
+    context_object_name = 'posts'
+
+    def get_queryset(self,):
+        query = self.request.GET.get('query')
+
+        if not query:
+            return Post.objects.none()
+
+        search_vector = SearchVector('title', 'description')
+        search_query = SearchQuery(query)
+
+        return (Post.objects.annotate(search=search_vector,
+                                     rank=SearchRank(search_vector, search_query),
+                                     headline=SearchHeadline('title', search_query))
+                .filter(search=search_query)).order_by('-rank')
 
 def tr_handler404(request, exception):
     return render(request=request, template_name = 'errors/error_page.html', status=404,context = {
