@@ -31,8 +31,12 @@
     </div>
     {% endif %}
     <div class="rating-buttons">
-        <button class="btn btn-sm btn-primary" data-post="{{ post.id }}" data-value="1">Лайк</button>
-        <button class="btn btn-sm btn-secondary" data-post="{{ post.id }}" data-value="-1">Дизлайк</button>
+        <button class="btn btn-sm btn-primary" data-post="{{ post.id }}" data-value="1">
+                        <img src="{% static 'icons/thumb_up.png' %}" alt = "Like" width="24">
+        </button>
+        <button class="btn btn-sm btn-secondary" data-post="{{ post.id }}" data-value="-1">
+             <img src="{% static 'icons/thumb_down.png' %}" alt = "Dislike" width="24">
+        </button>
         <button class="btn btn-sm btn-secondary rating-sum">{{ post.get_sum_rating }}</button>
     </div>
 </div>
