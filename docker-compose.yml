@@ -1,0 +1,37 @@
+services:
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      #- .:/app
+      - static_volume:/app/blog_advanced/static
+      - media_volume:/app/blog_advanced/media
+    ports:
+      - "8000:8000"
+    env_file:
+        - .env
+    depends_on:
+        - db
+    networks:
+        - blog_network
+  db:
+    image: postgres:15
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      POSTGRES_DB : ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5433:5432"
+    networks:
+      - blog_network
+
+volumes:
+  postgres_data:
+  static_volume:
+  media_volume:
+
+networks:
+  blog_network:
+    driver: bridge
