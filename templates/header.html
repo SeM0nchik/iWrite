@@ -15,19 +15,13 @@
                 <a class="nav-link px-3 py-2" href="{% url 'post_create' %}">Добавить статью</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link px-3 py-2" href="#">Мои статьи</a>
+                <a class="nav-link px-3 py-2" href=" {% url 'my_posts' %} ">Мои статьи</a>
             </li>
         </ul>
         {% endif %}
 
         <ul class="navbar-nav ms-auto gap-2">
             {% if request.user.is_authenticated %}
-                <li class="nav-item">
-                    <a class="nav-link px-3 py-2" href="{% url 'profile_detail' request.user.profile.slug %}">
-                        Профиль
-                    </a>
-                </li>
-
                 <li class="nav-item dropdown">
                     <a href="#" class="nav-link dropdown-toggle px-3 py-2" data-bs-toggle="dropdown" aria-expanded="false">
                         {{ request.user }}
