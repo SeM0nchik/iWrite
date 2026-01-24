@@ -197,6 +197,7 @@ class BlogSearchView(ListView):
     model = Post
     template_name = 'blog/post_list.html'
     context_object_name = 'posts'
+    paginate_by=10
 
     def get_queryset(self,):
         query = self.request.GET.get('query')
@@ -204,13 +205,34 @@ class BlogSearchView(ListView):
         if not query:
             return Post.objects.none()
 
-        search_vector = SearchVector('title', 'description')
+        vector = SearchVector('title', weight='A') + \
+            SearchVector('description', weight='B')
+
         search_query = SearchQuery(query)
 
-        return (Post.objects.annotate(search=search_vector,
-                                     rank=SearchRank(search_vector, search_query),
-                                     headline=SearchHeadline('title', search_query))
-                .filter(search=search_query)).order_by('-rank')
+        return Post.objects.annotate(
+            search=vector,
+            rank=SearchRank(vector, search_query),
+            headline=SearchHeadline(
+                'title',
+                search_query,
+                max_words=30,
+                start_sel='<mark>',
+                stop_sel='</mark>'
+            )
+        ).filter(
+            search=search_query,
+            rank__gt=0.4
+        ).order_by('-rank')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        query = self.request.GET.get('query')
+
+        context['query'] = query
+
+        return context
+
 
 def tr_handler404(request, exception):
     return render(request=request, template_name = 'errors/error_page.html', status=404,context = {
