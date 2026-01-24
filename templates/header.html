@@ -1,29 +1,49 @@
+{% load static %}
+
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
-        <a class="navbar-brand" href="/">My Django Blog 2.0</a>
-        </div>
-</nav>
-<div class='d-flex justify-content-end '>
-            {% if request.user.is_authenticated %}
-        <div class="dropdown text-end">
-          <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-            {{ request.user }}
-          </a>
-          <ul class="dropdown-menu text-small">
-            <li><a class="dropdown-item" href="{% url 'post_create' %}">Добавить статью</a></li>
-            <li><a class="dropdown-item" href="{% url 'profile_detail' request.user.profile.slug %}">Мой профиль</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li>
-                    <form action="{% url 'logout' %}" method="post">{% csrf_token %}
-                        <a href="#" class="dropdown-item" onclick="parentNode.submit();">Log Out</a>
-                    </form>
+        <a class="navbar-brand d-flex align-items-center me-5" href="/">
+            <div class="me-2">
+                <img src="{% static 'icons/blog_icon.png' %}" alt="Logo" style="height: 40px;">
+            </div>
+            <span>Simple Blog</span>
+        </a>
+
+        {% if request.user.is_authenticated %}
+        <ul class="navbar-nav me-auto gap-4">
+            <li class="nav-item">
+                <a class="nav-link px-3 py-2" href="{% url 'post_create' %}">Добавить статью</a>
             </li>
-          </ul>
-        </div>
-        {% else %}
-            <ul class="nav ">
-              <li><a href="{% url 'register' %}" class="nav-link px-2 link-secondary">Регистрация</a></li>
-              <li><a href="{% url 'login' %}" class="nav-link px-2 link-dark">Вход</a></li>
-            </ul>
+            <li class="nav-item">
+                <a class="nav-link px-3 py-2" href=" {% url 'my_posts' %} ">Мои статьи</a>
+            </li>
+        </ul>
         {% endif %}
-</div>
+
+        <ul class="navbar-nav ms-auto gap-2">
+            {% if request.user.is_authenticated %}
+                <li class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle px-3 py-2" data-bs-toggle="dropdown" aria-expanded="false">
+                        {{ request.user }}
+                    </a>
+                    <ul class="dropdown-menu text-small">
+                        <li><a class="dropdown-item" href="{% url 'profile_detail' request.user.profile.slug %}">Мой профиль</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form action="{% url 'logout' %}" method="post">{% csrf_token %}
+                                <a href="#" class="dropdown-item" onclick="parentNode.submit();">Log Out</a>
+                            </form>
+                        </li>
+                    </ul>
+                </li>
+            {% else %}
+                <li class="nav-item">
+                    <a class="nav-link px-3 py-2" href="{% url 'register' %}">Зарегистрироваться</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link px-3 py-2" href="{% url 'login' %}">Вход</a>
+                </li>
+            {% endif %}
+        </ul>
+    </div>
+</nav>
