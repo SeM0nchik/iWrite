@@ -12,5 +12,5 @@ COPY . .
 COPY --chmod=755 entrypoint.sh /app/entrypoint.sh
 
 EXPOSE 8000
-ENTRYPOINT ["/app/entrypoint.sh"]
+ENTRYPOINT ["/bin/bash", "/app/entrypoint.sh"]
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
