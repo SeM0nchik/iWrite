@@ -1,5 +1,4 @@
 {% load static %}
-
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
         <a class="navbar-brand d-flex align-items-center me-5" href="/">
@@ -19,6 +18,46 @@
             </li>
         </ul>
         {% endif %}
+
+        <form method="GET" action="{% url 'search' %}" class="d-flex me-3 ms-3">
+            <div class="input-group rounded-pill shadow-lg"
+                 style="
+                     width: 400px;
+                     height: 40px;
+                     border: 2px solid #6c757d;
+                     background: rgba(255, 255, 255, 0.5);
+                     backdrop-filter: blur(10px);
+                 ">
+                <input type="search"
+                       class="form-control border-0 border-end bg-transparent rounded-pill rounded-end-0 pe-4"
+                       name="query"
+                       placeholder="Поиск по блогу..."
+                       style="
+                           opacity: 0.8;
+                          border-color: var(--bs-dark, #212529) !important;
+                          color: var(--bs-dark, #212529)
+                       ">
+
+                <button class="btn border-0 border-start bg-transparent px-3"
+                        type="submit"
+                        style="
+                            border-color: var(--bs-dark, #212529) !important;
+                        ">
+                        <i class="bi bi-search"
+                           style="
+                               color: var(--bs-dark, #212529) !important;
+                               font-weight: 900 !important;
+                               font-variation-settings: 'wght' 900 !important;
+                               -webkit-text-stroke: 0.5px rgba(33,37,41,0.3) !important;
+                               text-shadow: 0 0 1px rgba(33,37,41,0.6)
+                           "></i>
+
+                </button>
+            </div>
+        </form>
+
+
+
 
         <ul class="navbar-nav ms-auto gap-2">
             {% if request.user.is_authenticated %}
