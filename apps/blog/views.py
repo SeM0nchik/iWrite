@@ -1,6 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, View
+
 from .models import Post, Category, Rating
 from .forms import PostCreteForm, PostUpdateForm, CommentCreateForm
 from ..services.mixins import AuthorRequiredMixin
@@ -15,7 +16,7 @@ class PostListView(ListView):
     model = Post
     template_name = 'blog/post_list.html'
     context_object_name = 'posts'
-    paginate_by = 2
+    paginate_by = 3
     queryset = Post.custom.all()
 
     def get_context_data(self, **kwargs):
@@ -146,6 +147,23 @@ class PostByTagListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = f'Статьи по тегу: {self.tag.name}'
+        return context
+
+class PostByUserListView(ListView):
+    model = Post
+    template_name = 'blog/post_list.html'
+    context_object_name = 'posts'
+    paginate_by=10
+    author = None
+
+    def get_queryset(self):
+        self.author = self.request.user
+        queryset = Post.objects.filter(author=self.author)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = f'Статьи пользователя {self.author.username}'
         return context
 
 class RatingCreateView(View):
