@@ -1,42 +1,71 @@
 {% extends 'main.html' %}
 
-
 {% block content %}
     {% load static %}
 
     {% for post in posts %}
-        <div class="card mb-3">
-            <div class="row">
-                <div class="col-4">
+        <div class="card mb-3 shadow-sm border-0 rounded-3 overflow-hidden">
+
+            <!-- Основной контент БЕЗ header -->
+            <div class="row g-0 h-100">
+                <div class="col-md-4">
                     {% if post.thumbnail %}
-                        <img src="{{ post.thumbnail.url }}" class="card-img-top" alt="{{ post.title }}">
+                        <img src="{{ post.thumbnail.url }}"
+                             class="card-img-top img-fluid w-100"
+                             style="height: auto; max-height: 250px; width: 100%; object-fit: cover;"
+                             alt="{{ post.title }}">
                     {% else %}
-                        <div class="d-flex align-items-center justify-content-center h-100">
-                            <p>Нет изображения</p>
+                        <div class="bg-light d-flex align-items-center justify-content-center"
+                             style="height: 200px; aspect-ratio: 3/4;">
+                            <i class="bi bi-image text-muted fs-2"></i>
                         </div>
                     {% endif %}
                 </div>
-                <div class="col-8">
-                    <div class="card-body">
-                        <h5 class="card-title">
-                            <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+                <div class="col-md-8">
+                    <div class="card-body p-4">
+                        <h5 class="card-title mb-3 fw-bold">
+                            <a href="{{ post.get_absolute_url }}">
+                                {{ post.title }}
+                            </a>
                         </h5>
-                        <p class="card-text">{{ post.description|safe }}</p>
-                        <small>Добавил {{ post.author.username }}, {{ post.create }},</small>
-                        в категорию: <a href="{{ post.category.get_absolute_url }}">{{ post.category.title }}</a>
+                        <p class="card-text text-secondary mb-0">{{ post.description|safe }}</p>
                     </div>
                 </div>
-                <div class="rating-buttons">
-                    <button class="btn btn-sm btn-primary" data-post="{{ post.id }}" data-value="1">
-                        <img src="{% static 'icons/thumb_up.png' %}" alt = "Like" width="24">
-                    </button>
-                    <button class="btn btn-sm btn-primary" data-post="{{ post.id }}" data-value="-1">
-                         <img src="{% static 'icons/thumb_down.png' %}" alt = "Dislike" width="24">
-                    </button>
-                    <button class="btn btn-sm btn-secondary rating-sum">{{ post.get_sum_rating }}</button>
+            </div>
+
+            <div class="card-footer bg-light border-top pt-3 pb-2 px-4">
+                <div class="d-flex align-items-center justify-content-between gap-3">
+                    <div class="rating-buttons d-flex gap-1"
+                         data-post-id="{{ post.id }}"
+                         data-positive="{{ post.get_positive_count|default:'0' }}"
+                         data-negative="{{ post.get_negative_count|default:'0' }}">
+                        <button class="btn btn-outline-primary btn-sm px-2 py-1 rounded-pill like-btn"
+                                data-post="{{ post.id }}" data-value="1">
+                            <img src="{% static 'icons/thumb_up.png' %}" width="16" class="me-1">
+                            <span class="positive-count">{{ post.get_positive_count|default:"0" }}</span>
+                        </button>
+                        <button class="btn btn-outline-primary btn-sm px-2 py-1 rounded-pill dislike-btn"
+                                data-post="{{ post.id }}" data-value="-1">
+                            <img src="{% static 'icons/thumb_down.png' %}" width="16" class="me-1">
+                            <span class="negative-count">{{ post.get_negative_count|default:"0" }}</span>
+                        </button>
+                    </div>
+
+                    <div class="text-muted small text-end">
+                        <i class="bi bi-folder me-1"></i>
+                        <a href="{{ post.category.get_absolute_url }}" class="text-primary fw-semibold text-decoration-none">
+                            {{ post.category.title }}
+                        </a>
+                        <span class="mx-2">•</span>
+                        <i class="bi bi-person me-1"></i>{{ post.author.username }}
+                        <span class="mx-1">•</span>
+                        {{ post.create|date:"d.m.Y H:i" }}
+                    </div>
                 </div>
             </div>
+
         </div>
+
     {% endfor %}
 {% endblock %}
 

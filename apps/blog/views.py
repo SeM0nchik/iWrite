@@ -192,7 +192,8 @@ class RatingCreateView(View):
                 rating.value = value
                 rating.user = user
                 rating.save()
-        return JsonResponse({'rating_sum': rating.post.get_sum_rating()})
+        return JsonResponse({'positive-count': rating.post.get_positive_count(),
+                             'negative-count': rating.post.get_negative_count(), })
 
 class BlogSearchView(ListView):
     model = Post
