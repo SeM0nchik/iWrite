@@ -12,5 +12,6 @@ urlpatterns = [
     path('category/<str:slug>', PostFromCategory.as_view(), name='post_by_category'),
     path('rating/', RatingCreateView.as_view(), name='rating'),
     path('post/my/', PostByUserListView.as_view(), name='my_posts'),
+    path('search/', BlogSearchView.as_view(), name='search'),
 
 ]
