@@ -3,6 +3,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank, SearchHeadline
 from django.utils.html import strip_tags
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, View
+from ..recommendations.redis_service import RecommendationService
 
 from .models import Post, Category, Rating
 from .forms import PostCreteForm, PostUpdateForm, CommentCreateForm
@@ -37,6 +38,7 @@ class PostDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         context['title'] = self.object.title
         context['form'] = CommentCreateForm
+        RecommendationService.on_view(self.object.pk)
         return context
 
 class PostFromCategory(ListView):
@@ -185,6 +187,8 @@ class RatingCreateView(View):
             defaults = {'value' : value, 'user' : user}
         )
 
+        RecommendationService().on_like(post_id)
+
         if not created:
             if rating.value == value:
                 rating.delete()
@@ -194,6 +198,23 @@ class RatingCreateView(View):
                 rating.save()
         return JsonResponse({'positive-count': rating.post.get_positive_count(),
                              'negative-count': rating.post.get_negative_count(), })
+
+class RecommendationListView(ListView):
+    model = Post
+    template_name = 'blog/blog_list.html'
+    context_object_name = 'posts'
+    paginate_by = 5
+
+    def get_queryset(self):
+        top_ids = RecommendationService().get_recommendations(10)
+        return Post.objects.filter(id__in=top_ids)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Сейчас в тренде'
+        page = context['page_obj']
+        context['paginator_range'] = page.paginator.get_elided_page_range(page.number)
+        return context
 
 class BlogSearchView(ListView):
     model = Post
