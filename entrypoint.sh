@@ -16,6 +16,9 @@ python manage.py migrate --noinput
 echo "Collecting static files..."
 python manage.py collectstatic --noinput
 
+echo "Initializing Redis cache files"
+python manage.py sync_posts_recommendations
+
 echo "Checking superuser..."
 python manage.py shell -c "
 from django.contrib.auth import get_user_model
