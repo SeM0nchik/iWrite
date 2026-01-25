@@ -46,10 +46,8 @@
             width: 400px;
              ">
 
-    <!-- 🔥 1. КОНТЕЙНЕР ПЕРЕД ФОРМОЙ (важно!) -->
             <div id="searchDropdownResults"></div>
 
-            <!-- 2. ФОРМА -->
             <form method="GET" action="{% url 'search' %}" class="d-flex me-3 ms-3">
                 <div class="input-group rounded-pill shadow-lg" style="
                      width: 400px;
@@ -57,7 +55,7 @@
                      border: 2px solid #6c757d;
                      background: rgba(255, 255, 255, 0.5);
                      backdrop-filter: blur(10px);
-                     position: relative; /* 🔥 ДОБАВЬТЕ ЭТО */
+                     position: relative;
                  ">
                     <input type="search"
                            id="searchInput"
