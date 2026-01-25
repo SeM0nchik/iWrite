@@ -68,8 +68,11 @@ class Post(models.Model):
         self.slug = unique_slugify(self, self.title, self.slug)
         super().save(*args, **kwargs)
 
-    def get_sum_rating(self):
-        return sum([rating.value for rating in self.ratings.all()])
+    def get_positive_count(self):
+        return sum([rating.value if rating.value == 1 else 0 for rating in self.ratings.all()])
+
+    def get_negative_count(self):
+        return sum([-rating.value if rating.value == -1 else 0 for rating in self.ratings.all()])
 
 
 class Category(MPTTModel):
