@@ -1,5 +1,4 @@
 {% load static %}
-
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
         <a class="navbar-brand d-flex align-items-center me-5" href="/">
@@ -18,7 +17,88 @@
                 <a class="nav-link px-3 py-2" href=" {% url 'my_posts' %} ">Мои статьи</a>
             </li>
         </ul>
+        {% else %}
+        <div class="navbar-nav me-auto gap-4">
+            <div class="nav-item">
+                <a class="nav-link px-3 py-2 "
+                   href="{% url 'home' %}"
+                   onclick="alert('Вы не авторизованы. Создать статью может только авторизованный пользователь!')">
+                    Добавить статью
+                </a>
+            </div>
+            <div class="nav-item">
+                <a class="nav-link px-3 py-2 "
+                   href="{% url 'home' %}"
+                   onclick="alert('Вы не авторизованы. У вас нет опубликованных статей')">
+                    Мои статьи
+                </a>
+            </div>
+        </div>
+
         {% endif %}
+
+        <div class="search-fixed" style="
+            position: absolute;
+            left: 55%;
+            transform: translateX(-50%) translateY(-50%);
+            top: 50%;
+            z-index: 10;
+            width: 400px;
+             ">
+
+    <!-- 🔥 1. КОНТЕЙНЕР ПЕРЕД ФОРМОЙ (важно!) -->
+            <div id="searchDropdownResults"></div>
+
+            <!-- 2. ФОРМА -->
+            <form method="GET" action="{% url 'search' %}" class="d-flex me-3 ms-3">
+                <div class="input-group rounded-pill shadow-lg" style="
+                     width: 400px;
+                     height: 40px;
+                     border: 2px solid #6c757d;
+                     background: rgba(255, 255, 255, 0.5);
+                     backdrop-filter: blur(10px);
+                     position: relative; /* 🔥 ДОБАВЬТЕ ЭТО */
+                 ">
+                    <input type="search"
+                           id="searchInput"
+                           class="form-control border-0 border-end bg-transparent rounded-pill rounded-end-0 pe-4"
+                           name="query"
+                           placeholder="Поиск..."
+                           style="
+                               opacity: 0.8;
+                               border-color: var(--bs-dark, #212529) !important;
+                               color: var(--bs-dark, #212529)
+                           ">
+
+                    <button class="btn border-0 border-start bg-transparent px-3"
+                            type="submit"
+                            style="border-color: var(--bs-dark, #212529) !important;">
+                        <i class="bi bi-search" style="
+                            color: var(--bs-dark, #212529) !important;
+                            font-weight: 900 !important;
+                            font-variation-settings: 'wght' 900 !important;
+                            -webkit-text-stroke: 0.5px rgba(33,37,41,0.3) !important;
+                            text-shadow: 0 0 1px rgba(33,37,41,0.6)
+                        "></i>
+                    </button>
+                </div>
+            </form>
+
+            <script src="{% static 'blog-search.js' %}"></script>
+            <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                new BlogSearch(
+                    'input[name="query"]',
+                    '#searchDropdownResults',
+                    "{% url 'search' %}"
+                );
+            });
+            </script>
+        </div>
+
+
+
+
 
         <ul class="navbar-nav ms-auto gap-2">
             {% if request.user.is_authenticated %}

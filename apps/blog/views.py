@@ -1,5 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
+from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank, SearchHeadline
+from django.utils.html import strip_tags
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, View
 
 from .models import Post, Category, Rating
@@ -191,6 +193,64 @@ class RatingCreateView(View):
                 rating.user = user
                 rating.save()
         return JsonResponse({'rating_sum': rating.post.get_sum_rating()})
+
+class BlogSearchView(ListView):
+    model = Post
+    template_name = 'blog/post_list.html'
+    context_object_name = 'posts'
+    paginate_by=10
+
+    def get_queryset(self,):
+        query = self.request.GET.get('query').strip()
+        return self.get_search_results(query)
+
+    def get_search_results(self, query):
+        if not query:
+            return Post.objects.none()
+
+        vector = vector = SearchVector('title', weight='A') + \
+            SearchVector('description', weight='B')
+
+        search_query = SearchQuery(query)
+        return Post.objects.annotate(
+            search=vector,
+            rank=SearchRank(vector, search_query),
+            headline=SearchHeadline(
+                'title',
+                search_query,
+                max_words=30,
+                start_sel='<mark>',
+                stop_sel='</mark>'
+            )
+        ).filter(
+            search=search_query,
+            rank__gt=0.2
+        ).order_by('-rank')
+
+    def render_to_response(self, context, **response_kwargs):
+        if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            query = self.request.GET.get('query').strip()
+
+            posts = self.get_search_results(query)
+
+            results = [{
+                'id' : post.id,
+                'title' : post.title,
+                'headline' : strip_tags(getattr(post, 'headline', post.description[:100])[:150]),
+                'url' : post.get_absolute_url(),
+                'rank' : float(getattr(post, 'rank', 0))
+            } for post in posts]
+
+            return JsonResponse({'results': results, 'count' : len(results)})
+        return super().render_to_response(context, **response_kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        query = self.request.GET.get('query')
+
+        context['query'] = query
+
+        return context
 
 
 def tr_handler404(request, exception):
