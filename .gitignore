@@ -18,3 +18,5 @@ static/django_mptt_admin/
 static/mptt/
 static/ckeditor/
 static/debug_toolbar/
+
+.cache/
