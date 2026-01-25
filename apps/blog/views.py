@@ -1,6 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank, SearchHeadline
+from django.utils.html import strip_tags
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, View
 
 from .models import Post, Category, Rating
@@ -200,16 +201,17 @@ class BlogSearchView(ListView):
     paginate_by=10
 
     def get_queryset(self,):
-        query = self.request.GET.get('query')
+        query = self.request.GET.get('query').strip()
+        return self.get_search_results(query)
 
+    def get_search_results(self, query):
         if not query:
             return Post.objects.none()
 
-        vector = SearchVector('title', weight='A') + \
+        vector = vector = SearchVector('title', weight='A') + \
             SearchVector('description', weight='B')
 
         search_query = SearchQuery(query)
-
         return Post.objects.annotate(
             search=vector,
             rank=SearchRank(vector, search_query),
@@ -222,8 +224,25 @@ class BlogSearchView(ListView):
             )
         ).filter(
             search=search_query,
-            rank__gt=0.4
+            rank__gt=0.2
         ).order_by('-rank')
+
+    def render_to_response(self, context, **response_kwargs):
+        if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            query = self.request.GET.get('query').strip()
+
+            posts = self.get_search_results(query)
+
+            results = [{
+                'id' : post.id,
+                'title' : post.title,
+                'headline' : strip_tags(getattr(post, 'headline', post.description[:100])[:150]),
+                'url' : post.get_absolute_url(),
+                'rank' : float(getattr(post, 'rank', 0))
+            } for post in posts]
+
+            return JsonResponse({'results': results, 'count' : len(results)})
+        return super().render_to_response(context, **response_kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
