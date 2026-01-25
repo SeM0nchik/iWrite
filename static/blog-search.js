@@ -1,5 +1,3 @@
-// static/js/blog-search.js
-
 class BlogSearch {
     constructor(searchInputSelector, resultsContainerSelector, searchUrl) {
         this.searchInput = document.querySelector(searchInputSelector);
@@ -12,12 +10,10 @@ class BlogSearch {
     }
 
     init() {
-        // Обработчик ввода с debounce
         this.searchInput.addEventListener('input', () => {
             this.debounce(this.handleSearch.bind(this), 250)();
         });
 
-        // Скрытие результатов при клике вне
         document.addEventListener('click', (e) => {
             if (!this.searchInput.contains(e.target) &&
                 !this.resultsContainer.contains(e.target)) {
@@ -25,11 +21,9 @@ class BlogSearch {
             }
         });
 
-        // Предотвращаем отправку формы при Enter
         const form = this.searchInput.closest('form');
         if (form) {
             form.addEventListener('submit', (e) => {
-                // Позволяем обычный поиск по Enter
                 return true;
             });
         }
@@ -139,12 +133,11 @@ class BlogSearch {
     }
 }
 
-// Инициализация при загрузке DOM
 document.addEventListener('DOMContentLoaded', function() {
-    // Подключаем к вашей поисковой форме
+
     new BlogSearch(
-        'input[name="query"]',           // селектор input
-        '#searchDropdownResults',       // селектор контейнера результатов
-        "{% url 'search' %}"            // URL вашего search view
+        'input[name="query"]',
+        '#searchDropdownResults',
+        "/search/"
     );
 });
