@@ -114,10 +114,13 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 RECAPTCHA_PUBLIC_KEY = os.getenv('RECAPTCHA_PUBLIC_KEY')
 RECAPTCHA_PRIVATE_KEY = os.getenv('RECAPTCHA_PRIVATE_KEY')
 
+REDIS_HOST = os.getenv('REDIS_HOST')
+REDIS_PORT = os.getenv('REDIS_PORT')
+REDIS_DB = os.getenv('REDIS_DB')
+
 CACHES  = {
     'default': {
         'BACKEND' : 'django.core.cache.backends.filebased.FileBasedCache',
         'LOCATION': BASE_DIR / 'cache',
-    }
-
+    },
 }
