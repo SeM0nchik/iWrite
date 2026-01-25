@@ -4,41 +4,52 @@
 {% block content %}
 
 <div class="card mb-3 shadow-sm">
-    <div class="row g-0">
-        <div class="col-md-4">
-            <img src="{{ post.thumbnail.url }}"
-                 {% if post.thumbnail %}
-                        class="card-img-top img-fluid"
-                        style="height: auto; max-height: 300px; width: 100%; object-fit: cover;"
-                        alt="{{ post.title }}">
-                {% else %}
-                <div class="card-img-top h-100 bg-light d-flex align-items-center justify-content-center">
-                    <i class="bi bi-image text-muted fs-1"></i>
+
+    <div class="card mb-4 shadow-sm border-0 rounded-top overflow-hidden">
+
+        <div class="card-header bg-light border-0">
+            <div class="row g-0 align-items-center">
+                <div class="col-md-4">
+                    {% if post.thumbnail %}
+                        <img src="{{ post.thumbnail.url }}"
+                             class="img-fluid rounded-start shadow-sm"
+                             style="width: 100%; height: auto; max-height: 250px; object-fit: cover;"
+                             alt="{{ post.title }}">
+                    {% else %}
+                        <div class="bg-light d-flex align-items-center justify-content-center rounded-start"
+                             style="height: 250px;">
+                            <i class="bi bi-image text-muted fs-1"></i>
+                        </div>
+                    {% endif %}
                 </div>
-            {% endif %}
-        </div>
-        <div class="col-md-8">
-            <div class="card-body">
-                <h5 class="card-title">{{ post.title }}</h5>
-                <p class="card-text">{{ post.description|safe|linebreaks }}</p>
-                <p class="card-text small text-muted">{{ post.text|safe }}</p>
-                <p class="mb-2">
-                    <small class="text-muted">
-                        Категория: <a href="{% url 'post_by_category' post.category.slug %}" class="text-decoration-none">{{ post.category.title }}</a>
+
+                <div class="col-md-8 ps-4">
+                    <h3 class="h3 fw-bold mb-2">{{ post.title }}</h3>
+                    <p class="text-muted mb-3 small">
+                        Категория:
+                        <a href="{% url 'post_by_category' post.category.slug %}"
+                           class="text-decoration-none text-primary fw-semibold">
+                            {{ post.category.title }}
+                        </a>
                         • Автор: {{ post.author.username }}
                         • {{ post.time_create|date:"d.m.Y H:i" }}
-                    </small>
-                </p>
+                    </p>
+                    <p class="mb-0 text-secondary">{{ post.description|safe }}</p>
+                </div>
             </div>
+        </div>
+
+
+        <div class="card-body">
+            <p class="card-text">{{ post.text|safe }}</p>
         </div>
     </div>
 
 
 
-    <div class="card-footer bg-light border-top pt-3 pb-2">
+    <div class="card-footer bg-light border-0 pt-1 pb-2 px-3">
         <div class="row align-items-center g-3">
             <div class="col-md-8">
-                <!-- Контейнер для рейтинга (JS сам создаст кнопки) -->
                 <div class="rating-buttons"
                      data-post-id="{{ post.id }}"
                      data-positive="{{ post.get_positive_count|default:'0' }}"
