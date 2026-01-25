@@ -38,7 +38,7 @@ class PostDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         context['title'] = self.object.title
         context['form'] = CommentCreateForm
-        RecommendationService.on_view(self.object.pk)
+        RecommendationService().on_view(self.object.pk)
         return context
 
 class PostFromCategory(ListView):
