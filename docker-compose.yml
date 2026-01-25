@@ -40,6 +40,8 @@ services:
       retries: 5
     networks:
       - blog_network
+    depends_on:
+      - db
 
 
 volumes:
