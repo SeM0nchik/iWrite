@@ -2,13 +2,25 @@ import redis
 from math import exp, log
 from .splaytree import SplayTree
 from time import time
+from django.conf import settings
 
 
 class RecommendationService:
+    _instance = None
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+            cls._instance.redis = redis.Redis(
+                host=settings.REDIS_HOST,
+                port=settings.REDIS_PORT,
+                db=settings.REDIS_DB,
+                decode_responses=True
+            )
+            cls._instance.tree = SplayTree()
+        return cls._instance
 
     def __init__(self):
-        self.redis = redis.Redis(host='localhost', port=6379, db=0)
-        self.tree = SplayTree()
+        pass
 
     def calculate_score(self, post_id) ->float:
         metrics = self.redis.hgetall(f"post:{post_id}:metrics")
