@@ -20,3 +20,4 @@ static/ckeditor/
 static/debug_toolbar/
 
 .cache/
+__pycache__/
