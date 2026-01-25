@@ -2,54 +2,93 @@
 {% load mptt_tags %}
 {% load static %}
 {% block content %}
-<div class="card mb-3">
-    <div class="row">
-        <div class="col-4">
-            {% if post.thumbnail %}
-                <img src="{{ post.thumbnail.url }}" class="card-img-top" alt="{{ post.title }}">
-            {% else %}
-                <div class="d-flex align-items-center justify-content-center h-100">
-                    <p>Нет изображения</p>
+
+<div class="card mb-3 shadow-sm">
+    <div class="row g-0">
+        <div class="col-md-4">
+            <img src="{{ post.thumbnail.url }}"
+                 {% if post.thumbnail %}
+                        class="card-img-top img-fluid"
+                        style="height: auto; max-height: 300px; width: 100%; object-fit: cover;"
+                        alt="{{ post.title }}">
+                {% else %}
+                <div class="card-img-top h-100 bg-light d-flex align-items-center justify-content-center">
+                    <i class="bi bi-image text-muted fs-1"></i>
                 </div>
             {% endif %}
         </div>
-        <div class="col-8">
+        <div class="col-md-8">
             <div class="card-body">
-                <h5>{{ post.title }}</h5>
-                <p class="card-text">{{ post.description|safe }}</p>
-                <p class="card-text">{{ post.text|safe }}</p>
-                Категория:
-                <a href="{% url 'post_by_category' post.category.slug %}">
-                    {{ post.category.title }}
-                </a> / Добавил: {{ post.author.username }} / <small>{{ post.time_create }}</small>
+                <h5 class="card-title">{{ post.title }}</h5>
+                <p class="card-text">{{ post.description|safe|linebreaks }}</p>
+                <p class="card-text small text-muted">{{ post.text|safe }}</p>
+                <p class="mb-2">
+                    <small class="text-muted">
+                        Категория: <a href="{% url 'post_by_category' post.category.slug %}" class="text-decoration-none">{{ post.category.title }}</a>
+                        • Автор: {{ post.author.username }}
+                        • {{ post.time_create|date:"d.m.Y H:i" }}
+                    </small>
+                </p>
             </div>
         </div>
     </div>
-    {% if post.tags.all %}
-    <div class="card-footer border-0">
-        Теги записи: {% for tag in post.tags.all %} <a href="{% url 'post_by_tags' tag.slug %}">{{ tag }}</a>, {% endfor %}
-    </div>
-    {% endif %}
-    <div class="rating-buttons">
-        <button class="btn btn-sm btn-primary" data-post="{{ post.id }}" data-value="1">
-                        <img src="{% static 'icons/thumb_up.png' %}" alt = "Like" width="24">
-        </button>
-        <button class="btn btn-sm btn-primary" data-post="{{ post.id }}" data-value="-1">
-             <img src="{% static 'icons/thumb_down.png' %}" alt = "Dislike" width="24">
-        </button>
-        <button class="btn btn-sm btn-secondary rating-sum">{{ post.get_sum_rating }}</button>
+
+
+
+    <div class="card-footer bg-light border-top pt-3 pb-2">
+        <div class="row align-items-center g-3">
+            <div class="col-md-8">
+                <!-- Контейнер для рейтинга (JS сам создаст кнопки) -->
+                <div class="rating-buttons"
+                     data-post-id="{{ post.id }}"
+                     data-positive="{{ post.get_positive_count|default:'0' }}"
+                     data-negative="{{ post.get_negative_count|default:'0' }}">
+                    <button class="btn btn-outline-primary btn-sm px-3 py-1 rounded-pill like-btn"
+                            data-post="{{ post.id }}" data-value="1">
+                        <img src="{% static 'icons/thumb_up.png' %}" width="20" class="me-1">
+                        <span class="positive-count">{{ post.get_positive_count|default:"0" }}</span>
+                    </button>
+                    <button class="btn btn-outline-primary btn-sm px-3 py-1 rounded-pill dislike-btn"
+                            data-post="{{ post.id }}" data-value="-1">
+                        <img src="{% static 'icons/thumb_down.png' %}" width="20" class="me-1">
+                        <span class="negative-count">{{ post.get_negative_count|default:"0" }}</span>
+                    </button>
+                </div>
+
+                {% if post.tags.all %}
+                <div class="d-flex flex-wrap gap-1">
+                    Теги:
+                    {% for tag in post.tags.all %}
+                        <a href="{% url 'post_by_tags' tag.slug %}"
+                           class="badge bg-light text-dark text-decoration-none border rounded-pill px-2 py-1 small">
+                            #{{ tag }}
+                        </a>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="col-md-4 text-md-end">
+                {% if user.is_authenticated and user == post.author %}
+                <a href="{% url 'post_update' post.slug %}" class="btn btn-primary btn-sm px-4 rounded-pill shadow-sm">
+                    <i class="bi bi-pencil-square me-1"></i>Править профиль
+                </a>
+                {% endif %}
+            </div>
+        </div>
     </div>
 </div>
-<div class="card border-0">
+
+
+
+<div class="card border-0 mt-4">
     <div class="card-body">
-        <h5 class="card-title">
-            Комментарии
-        </h5>
+        <h5 class="card-title">Комментарии</h5>
         {% include 'blog/comments/comments_list.html' %}
     </div>
 </div>
 {% endblock %}
 
 {% block script %}
-    <script src="{% static 'ratings.js' %}"></script>
+<script src="{% static 'ratings.js' %}"></script>
 {% endblock %}
