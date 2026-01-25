@@ -44,7 +44,7 @@ class SplayTree(object):
         node.right = q.left
 
         if (q.left):
-            q.right.parent = node
+            q.left.parent = node
 
         q.parent = parent
 
@@ -68,15 +68,18 @@ class SplayTree(object):
             if score < current.score:
                 if not current.left:
                     current.left = Node(post_id,score, current)
+                    self.splay(current.left)
                     return
                 current = current.left
             elif score > current.score:
                 if not current.right:
                     current.right = Node(post_id, score, current)
+                    self.splay(current.right)
                     return
                 current = current.right
             else:
                 return
+
 
     def find(self, post_id : int, score : float):
         current : Node = self.root
@@ -137,75 +140,30 @@ class SplayTree(object):
     def clear(self):
         self.root = None
 
-    def delete(self, post_id : int, score : float):
+    def delete(self, post_id: int, score: float):
+        pass
 
-        node = self.find(post_id, score)
-
-        if not node:
-            return False
-
-        self.splay(node)
-
-        left_child = node.left
-        right_child = node.right
-
-        if not left_child:
-            self.root = right_child
-            if right_child:
-                right_child.parent = None
-        elif not right_child:
-            self.root = left_child
-            if left_child:
-                left_child.parent = None
-        else :
-            max_left = left_child
-
-            while max_left.right:
-                max_left = max_left.right
-
-            self.splay(max_left)
-
-            max_left.left = left_child
-            left_child.parent = max_left
-
-            max_left.right = right_child
-            right_child.parent = max_left
-
-            self.root = max_left
-            self.root.parent = None
-
-        return True
-
-    def get_top_posts(self, limit : int = 5):
+    def get_top_posts(self, limit: int = 5):
         results = []
 
-        def collect_posts(node : Node):
-            if not node or len(results) >= limit:
-                return
+        if not self.root:
+            return results
 
-            collect_posts(node.right)
 
+        stack = []
+        node = self.root
+
+        while node:
+            stack.append(node)
+            node = node.right
+
+        while stack and len(results) < limit:
+            node = stack.pop()
             results.append(node.post_id)
 
-            if len(results) < limit:
-                collect_posts(node.left)
+            node = node.left
+            while node:
+                stack.append(node)
+                node = node.right
 
-
-        collect_posts(self.root)
-        return results[:limit]
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        return results
