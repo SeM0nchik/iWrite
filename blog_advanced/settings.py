@@ -29,6 +29,9 @@ INSTALLED_APPS = [
     'django_recaptcha',
     'ckeditor',
     'ckeditor_uploader',
+    'django_celery_beat',
+    'apps.recommendations',
+
 
 ]
 
@@ -123,4 +126,19 @@ CACHES  = {
         'BACKEND' : 'django.core.cache.backends.filebased.FileBasedCache',
         'LOCATION': BASE_DIR / 'cache',
     },
+}
+
+CELERY_BROKER_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}"
+CELERY_RESULT_BACKEND = f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}"
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+
+CELERY_TIMEZONE = "UTC"
+CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
+
+CELERY_BEAT_SCHEDULE = {
+    "recompute-recommendations": {
+        "task": "apps.recommendations.tasks.recalculate_score_batch",
+        "schedule": 10.0,
+    }
 }
