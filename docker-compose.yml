@@ -43,6 +43,34 @@ services:
     depends_on:
       - db
 
+  celery_worker:
+    build: .
+    command: celery -A blog_advanced worker -l info
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    depends_on:
+      - web
+      - db
+      - redis
+    networks:
+      - blog_network
+
+  celery_beat:
+    build: .
+    command: celery -A blog_advanced beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    depends_on:
+      - web
+      - db
+      - redis
+    networks:
+      - blog_network
+
 
 volumes:
   postgres_data:
@@ -53,3 +81,5 @@ volumes:
 networks:
   blog_network:
     driver: bridge
+
+
