@@ -1,5 +1,5 @@
 class Node(object):
-    def __init__(self, post_id : int, score : float, parent):
+    def __init__(self, post_id : int, score : int, parent):
         self.post_id = post_id
         self.score = score
         self.parent : Node  = parent
@@ -25,7 +25,7 @@ class SplayTree(object):
         q.parent = parent
 
         if not parent:
-            root = q
+            self.root = q
         elif node == parent.left:
             parent.left = node
         else :
@@ -49,16 +49,16 @@ class SplayTree(object):
         q.parent = parent
 
         if not parent:
-            root = q
+            self.root = q
         elif node == parent.right:
-            parent.left = node
-        else :
             parent.right = q
+        else :
+            parent.left = q
 
         q.left = node
         node.parent = q
 
-    def insert(self, post_id :int, score : float):
+    def insert(self, post_id :int, score : int):
         if not self.root:
             self.root = Node(post_id,score, None)
             return
@@ -67,21 +67,25 @@ class SplayTree(object):
         while current:
             if score < current.score:
                 if not current.left:
-                    current.left = Node(post_id,score, current)
-                    self.splay(current.left)
+                    new_node = Node(post_id, score, current)
+                    current.left = new_node
+                    self.root = self.splay(new_node)
                     return
                 current = current.left
             elif score > current.score:
                 if not current.right:
-                    current.right = Node(post_id, score, current)
-                    self.splay(current.right)
+                    new_node = Node(post_id, score, current)
+                    current.right = new_node
+                    self.root = self.splay(new_node)
                     return
                 current = current.right
             else:
+                current.score = score
+                self.root = self.splay(current)
                 return
 
 
-    def find(self, post_id : int, score : float):
+    def find(self, post_id : int, score : int):
         current : Node = self.root
         while current:
             if current.post_id == post_id and abs(current.score - score) < 0.001:
@@ -140,8 +144,41 @@ class SplayTree(object):
     def clear(self):
         self.root = None
 
-    def delete(self, post_id: int, score: float):
-        pass
+    def delete(self, post_id: int, score: int):
+        node = self.find(post_id , score)
+
+        if not node:
+            return
+
+        self.splay(node)
+
+        left = node.left
+        right = node.right
+
+        if left:
+            left.parent = None
+        if right:
+            right.parent = None
+
+        if not left:
+            self.root = right
+            return
+
+        max_left =left
+
+        while max_left.right:
+            max_left = max_left.right
+
+        self.splay(max_left)
+        max_left.right = right
+        if right:
+            right.parent = max_left
+
+        self.root = max_left
+
+        return
+
+
 
     def get_top_posts(self, limit: int = 5):
         results = []
