@@ -13,5 +13,6 @@ urlpatterns = [
     path('rating/', RatingCreateView.as_view(), name='rating'),
     path('post/my/', PostByUserListView.as_view(), name='my_posts'),
     path('search/', BlogSearchView.as_view(), name='search'),
+    path('recommendations/', RecommendationListView.as_view(), name='recommendations'),
 
 ]

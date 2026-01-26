@@ -3,6 +3,7 @@ WORKDIR /app
 
 RUN apt-get update && apt-get install -y \
     gcc postgresql-client libpq-dev netcat-openbsd \
+     redis-tools \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
