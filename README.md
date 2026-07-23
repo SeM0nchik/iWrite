@@ -11,6 +11,7 @@
 
 ## Содержание
 - [Технологии](#технологии)
+- [Установка и запуск](#установка-и-запуск)
 - [База данных](#архитектура-базы-данных)
 - [Структура проекта](#структура-проекта)
 - [Ключевые фичи](#ключевые-фичи-проекта)
@@ -37,6 +38,22 @@
 ![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-ES2023-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
 
+## Установка и запуск
+
+1. Скопируйте `.env.example` в `.env` и заполните значения (минимум `SECRET_KEY`,
+   `DB_PASSWORD`):
+   ```bash
+   cp .env.example .env
+   ```
+2. Запустите проект через Docker Compose:
+   ```bash
+   docker-compose up --build
+   ```
+   Поднимутся сервисы `web` (Django), `db` (PostgreSQL), `redis`, `celery_worker`
+   и `celery_beat`. `entrypoint.sh` автоматически применит миграции, соберёт
+   статику и создаст суперюзера `admin` / `admin123`, если его ещё нет.
+3. Приложение будет доступно на [http://localhost:8000](http://localhost:8000).
+
 ## Архитектура базы данных
 
 ![dbdiagram.png](docs/architecture/dbarchitecture.png)
@@ -46,26 +63,34 @@
 ```
 ├── README.md
 ├── .gitignore
+├── .env.example
 ├── docker-compose.yml
-├── Docker
+├── Dockerfile
 ├── entrypoint.sh           # Скрипт для инициализации кэша и создания БД
 ├── requirements.txt
-├── docs/                   # Документы и файлы для README 
+├── docs/                   # Документы и файлы для README
 ├── media/                  # Аватары и картинки к постам
-├── static/                 # Файлы js и css а также иконки для сайта
-├── blog_advanced/          # настройки проекта 
-├── templates/              
+├── static/                 # Статика проекта
+│   ├── js/
+│   │   ├── blog/           # JS для блога (поиск, комментарии, рейтинги)
+│   │   └── common/         # Общий JS (backend.js)
+│   ├── css/
+│   │   └── blog/           # CSS для блога
+│   └── icons/
+│       ├── common/         # Общие иконки (лого)
+│       └── blog/           # Иконки рейтинга постов
+├── blog_advanced/          # Настройки проекта
+├── templates/
 │   ├── accounts/           # Шаблоны аккаунтов и страниц регистрации
 │   ├── blog/               # Шаблоны постов и тд
 │   ├── errors/             # Шаблоны ошибок
-│   ├── includes/           # Дополнительные шаблоны
-│   └── ...                 # Шаблоны основной страницы
+│   ├── includes/           # Layout-партиалы (header, footer, sidebar, pagination, messages)
+│   └── main.html           # Базовый шаблон
 └── apps/
     ├── accounts            # Аккаунты и логика авторизации
     ├── blog                # Блог
-    ├── recommendations     # Сервис рекоммендаций 
-    └── sevices             # Доп настройки сервисов       
-    
+    ├── recommendations     # Сервис рекомендаций
+    └── services            # Доп настройки сервисов
 ```
 
 --- 

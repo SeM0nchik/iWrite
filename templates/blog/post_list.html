@@ -41,12 +41,12 @@
                          data-negative="{{ post.get_negative_count|default:'0' }}">
                         <button class="btn btn-outline-primary btn-sm px-2 py-1 rounded-pill like-btn"
                                 data-post="{{ post.id }}" data-value="1">
-                            <img src="{% static 'icons/thumb_up.png' %}" width="16" class="me-1">
+                            <img src="{% static 'icons/blog/thumb_up.png' %}" width="16" class="me-1">
                             <span class="positive-count">{{ post.get_positive_count|default:"0" }}</span>
                         </button>
                         <button class="btn btn-outline-primary btn-sm px-2 py-1 rounded-pill dislike-btn"
                                 data-post="{{ post.id }}" data-value="-1">
-                            <img src="{% static 'icons/thumb_down.png' %}" width="16" class="me-1">
+                            <img src="{% static 'icons/blog/thumb_down.png' %}" width="16" class="me-1">
                             <span class="negative-count">{{ post.get_negative_count|default:"0" }}</span>
                         </button>
                     </div>
@@ -70,5 +70,5 @@
 {% endblock %}
 
 {% block script %}
-    <script src="{% static 'ratings.js' %}"></script>
+    <script src="{% static 'js/blog/ratings.js' %}"></script>
 {% endblock %}
